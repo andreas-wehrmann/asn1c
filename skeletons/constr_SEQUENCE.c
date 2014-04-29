@@ -1194,19 +1194,19 @@ SEQUENCE_decode_uper(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 
 		/* Skip over overflow extensions which aren't present
 		 * in this system's version of the protocol */
-		for(;;) {
-			ASN_DEBUG("Getting overflow extensions");
-			switch(per_get_few_bits(&epmd, 1)) {
-			case -1: break;
-			case 0: continue;
-			default:
-				if(uper_open_type_skip(opt_codec_ctx, pd)) {
-					FREEMEM(epres);
-					_ASN_DECODE_STARVED;
-				}
-			}
-			break;
-		}
+        do
+        {
+            int32_t next_present = per_get_few_bits(&epmd, 1);
+
+            if( -1 == next_present ) { break; }
+            else if( 0 == next_present ) { continue; }
+            else {
+                if(uper_open_type_skip(opt_codec_ctx, pd)) {
+                    FREEMEM(epres);
+                    _ASN_DECODE_STARVED;
+                }
+            }
+        }while((epmd.nbits - epmd.nboff) > 0);
 
 		FREEMEM(epres);
 	}

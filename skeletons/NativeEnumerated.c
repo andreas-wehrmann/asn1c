@@ -62,12 +62,13 @@ NativeEnumerated_encode_xer(asn_TYPE_descriptor_t *td, void *sptr,
 		er.encoded = snprintf(src, srcsize, "<%s/>", el->enum_name);
 		assert(er.encoded > 0 && (size_t)er.encoded < srcsize);
 		if(cb(src, er.encoded, app_key) < 0) _ASN_ENCODE_FAILED;
-		_ASN_ENCODED_OK(er);
 	} else {
-		ASN_DEBUG("ASN.1 forbids dealing with "
-			"unknown value of ENUMERATED type");
-		_ASN_ENCODE_FAILED;
-	}
+        const char* unknown_str = "<unknown/>";
+        er.encoded = strlen( unknown_str );
+        if(cb(unknown_str, er.encoded, app_key) < 0) _ASN_ENCODE_FAILED;
+    }
+
+    _ASN_ENCODED_OK(er);
 }
 
 asn_dec_rval_t
@@ -115,8 +116,15 @@ NativeEnumerated_decode_uper(asn_codec_ctx_t *opt_codec_ctx,
 		value = uper_get_nsnnwn(pd);
 		if(value < 0) _ASN_DECODE_STARVED;
 		value += specs->extension - 1;
-		if(value >= specs->map_count)
-			_ASN_DECODE_FAILED;
+		if(value >= specs->map_count) {
+            ASN_DEBUG("Decoded %s = %ld <unknown extension>", td->name, value);
+
+            /*  Make sure we get an illegal enum value.
+                This should be fine since ASN1 requires subsequent enum values to be higher than previous ones.
+            */
+            *native = specs->value2enum[0].nat_value - 1;
+            return rval;
+        }
 	}
 
 	*native = specs->value2enum[value].nat_value;
