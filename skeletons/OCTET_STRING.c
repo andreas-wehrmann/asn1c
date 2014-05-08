@@ -623,10 +623,10 @@ OCTET_STRING_encode_xer(asn_TYPE_descriptor_t *td, void *sptr,
 			}
 			*p++ = h2c[(*buf >> 4) & 0x0F];
 			*p++ = h2c[*buf & 0x0F];
-			*p++ = 0x20;
+			//*p++ = 0x20;
 		}
 		if(p - scratch) {
-			p--;	/* Remove the tail space */
+			//p--;	/* Remove the tail space */
 			_ASN_CALLBACK(scratch, p-scratch); /* Dump the rest */
 			er.encoded += p - scratch;
 			if(st->size > 16)
