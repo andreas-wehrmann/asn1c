@@ -158,8 +158,15 @@ BIT_STRING_encode_uper(const asn_TYPE_descriptor_t *td,
     }
     ct_extensible = csiz->flags & APC_EXTENSIBLE;
 
+#if !defined(UPER_REMOVE_TRAILING_BITS)
     /* Figure out the size without the trailing bits */
     st = BIT_STRING__compactify(st, &compact_bstr);
+    /* 
+     * Reason for disabling the above truncation:
+     * trailing bits in a bit-string usually
+     * are meaningful, as "0000" is not the same as "000000".
+     */
+#endif /* UPER_REMOVE_TRAILING_BITS */
     size_in_bits = 8 * st->size - st->bits_unused;
 
     ASN_DEBUG(
