@@ -29,7 +29,11 @@ NativeEnumerated_encode_xer(const asn_TYPE_descriptor_t *td, const void *sptr,
         ASN__ENCODED_OK(er);
     } else {
         ASN_DEBUG("No element corresponds to the value %ld", *native);
-        ASN__ENCODE_FAILED;
+        er.encoded =
+            asn__format_to_callback(cb, app_key, "<unknown/>");
+        if(er.encoded < 0) ASN__ENCODE_FAILED;
+        ASN__ENCODED_OK(er);
+        //ASN__ENCODE_FAILED;
     }
 }
 
