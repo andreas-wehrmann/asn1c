@@ -87,6 +87,9 @@ NativeEnumerated_constraint(const asn_TYPE_descriptor_t *td, const void *sptr,
     el = INTEGER_map_value2enum(specs, *native);
     if(el) {
         return 0;
+    } else if(specs->extension) {
+        ASN_DEBUG("No element corresponds to the extension value %ld", *native);
+        return 0;
     } else {
         ASN_DEBUG("No element corresponds to the value %ld", *native);
         return -1;
