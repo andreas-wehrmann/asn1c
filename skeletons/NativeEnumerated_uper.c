@@ -53,8 +53,12 @@ NativeEnumerated_decode_uper(const asn_codec_ctx_t *opt_codec_ctx,
         value = uper_get_nsnnwn(pd);
         if(value < 0) ASN__DECODE_STARVED;
         value += specs->extension - 1;
-        if(value >= specs->map_count)
-            ASN__DECODE_FAILED;
+        if(value >= specs->map_count) {
+          *native = value + 1;
+          ASN_DEBUG("Decoded extension %s = %ld", td->name, *native);
+          return rval;
+        }
+            //ASN__DECODE_FAILED;
     }
 
     *native = specs->value2enum[value].nat_value;
